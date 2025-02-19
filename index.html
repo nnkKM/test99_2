@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SDG 11.2.1 ver.99.0</title>
+    <link href="https://unpkg.com/maplibre-gl@1.15.2/dist/maplibre-gl.css" rel="stylesheet"/>
+
+
+
+    <link href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-draw/v1.2.0/mapbox-gl-draw.css" rel="stylesheet" />
+    <style>
+        #map {
+            width: 100%;
+            height: 100vh;
+        }
+        #controls {
+            position: absolute;
+            top: 5px;
+            left: 5px;
+            padding: 10px;
+            border-radius: 3px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        }
+        .disp-layers {
+            background-color: #ffffff;
+            margin: 3px;
+        }
+        .disp-attributes {
+            background-color: #ffffff;
+            margin: 3px;
+        }
+        #zoom-level {
+            position: absolute;
+            top: 10px;
+            right: 50px;
+            background-color: white;
+            padding: 5px;
+            border-radius: 3px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        }
+        #note-display {
+            display: none;
+            position: absolute;
+            background-color: rgba(255, 255, 255, 0.5); /* 半透明の背景色 */
+            padding: 5px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+            white-space: nowrap; /* 改行されないようにする */
+        }
+
+
+    </style>
+</head>
+<body>
+    <div id="map"></div>
+    <div id="controls">
+        <button id="toggle-layers-btn">Layer On/Off</button>
+        <div id="layers-container" class="disp-layers" style="display: none;">
+            <label>
+                <input type="checkbox" id="osm-layer-chk" checked>
+                Open Street Map
+            </label>
+            <br>
+            <label>
+                <input type="checkbox" id="population-all-fill-layer-chk" checked>
+                Population2020
+            </label>
+            <br>
+            <label>
+                <input type="checkbox" id="PublicTransport-points-layer-chk" checked>
+                バス停・フェリー乗り場
+            </label>
+            <br>
+            <label>
+                <input type="checkbox" id="MicroletRoute-line-layer-chk" checked>
+                MicroletRoute
+            </label>
+            <br>
+            <label>
+                <input type="checkbox" id="outline-layer-chk">
+                境界線
+            </label>
+            <br>
+            <label>------属性情報------</label>
+            <div id="attributes"></div>
+        </div>
+
+        <div id="note-form" style="display: none;">
+            <label for="note-text">メモ:</label>
+            <input type="text" id="note-text"/>
+            <button id="save-note-btn">保存</button>
+        </div>
+  
+      <div id="note-display" style="display: none;">
+
+            <div id="note-content"></div>
+        </div>
+
+
+    </div>
+    <div id="zoom-level">Zoom: 12</div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@turf/turf/turf.min.js"></script>
+    <script src="https://unpkg.com/maplibre-gl@1.15.2/dist/maplibre-gl.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/pmtiles/dist/pmtiles.js"></script>
+    <script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-draw/v1.2.0/mapbox-gl-draw.js"></script>
+    <script>
+        const protocol = new pmtiles.Protocol();
+        maplibregl.addProtocol('pmtiles', protocol.tile);
+
+        const map = new maplibregl.Map({
+            container: 'map',
+            style: 'style.json',
+            center: [100.53, 13.75],
+            zoom: 8
+        });
+
+        map.addControl(new maplibregl.NavigationControl());
+
+        const draw = new MapboxDraw({
+            displayControlsDefault: false,
+            controls: {
+                point: true,
+                line_string: true,
+                polygon: true,
+                trash: true
+            }
+        });
+
+        map.addControl(draw);
+
+        const layerIds = [
+            'osm-layer',
+            'PublicTransport-points-layer',
+            'MicroletRoute-line-layer'
+        ];
+
+        document.querySelector('#population-all-fill-layer-chk').addEventListener('change', () => {
+            const isChecked = document.getElementById('population-all-fill-layer-chk').checked;
+            const fillLayerIds = ['population-fill-layer', 'population-outline-layer'];
+            fillLayerIds.forEach(id => {
+                if (isChecked) {
+                    map.setLayoutProperty(id, 'visibility', 'visible');
+                } else {
+                    map.setLayoutProperty(id, 'visibility', 'none');
+                }
+            });
+        });
+
+        document.querySelector('#outline-layer-chk').addEventListener('change', () => {
+            const isChecked = document.getElementById('outline-layer-chk').checked;
+            const outlineLayerIds = ['MUNICIPIO-outline-layer', 'PostuAdministrativo-outline-layer', 'Suco-outline-layer'];
+            outlineLayerIds.forEach(id => {
+                if (isChecked) {
+                    map.setLayoutProperty(id, 'visibility', 'visible');
+                } else {
+                    map.setLayoutProperty(id, 'visibility', 'none');
+                }
+            });
+        });
+
+        document.querySelector('#toggle-layers-btn').addEventListener('click', () => {
+            const layersContainer = document.getElementById('layers-container');
+            if (layersContainer.style.display === 'none' || layersContainer.style.display === '') {
+                layersContainer.style.display = 'block';
+            } else {
+                layersContainer.style.display = 'none';
+            }
+        });
+
+        const toggleLayer = (id) => {
+            const isChecked = document.getElementById(`${id}-chk`).checked;
+            if (isChecked) {
+                map.setLayoutProperty(id, 'visibility', 'visible');
+            } else {
+                map.setLayoutProperty(id, 'visibility', 'none');
+            }
+        }
+
+        layerIds.forEach(lyrId => {
+            document.querySelector(`#${lyrId}-chk`).addEventListener('change', () => {
+                toggleLayer(lyrId);
+            });
+        });
+
+        const updateZoomLevel = () => {
+            const zoom = map.getZoom().toFixed(2);
+            document.getElementById('zoom-level').innerText = `Zoom: ${zoom}`;
+        }
+
+        map.on('zoom', updateZoomLevel);
+        updateZoomLevel();
+        document.getElementById('save-note-btn').addEventListener('click', () => {
+            const noteText = document.getElementById('note-text').value;
+            if (selectedFeatureId) {
+                draw.setFeatureProperty(selectedFeatureId, 'note', noteText);
+
+        console.log(`Feature ID: ${selectedFeatureId}, Note: ${noteText}`);
+
+                document.getElementById('note-form').style.display = 'none';
+                alert('メモが保存されました');
+            }
+        });
+
+let selectedFeatureId;
+
+map.on('draw.create', function (e) {
+    const feature = e.features[0];
+    if (feature.geometry.type === 'Point') {
+        selectedFeatureId = feature.id;
+        console.log(`Created Feature ID: ${selectedFeatureId}`);
+        document.getElementById('note-form').style.display = 'block';
+    }
+});
+
+map.on('draw.update', function (e) {
+    const feature = e.features[0];
+    if (feature.geometry.type === 'Point') {
+        selectedFeatureId = feature.id;
+        console.log(`Updated Feature ID: ${selectedFeatureId}`);
+        document.getElementById('note-form').style.display = 'block';
+    }
+});
+
+
+
+map.on('click', (e) => {
+    console.log(`クリック位置: 緯度 ${e.lngLat.lat}, 経度 ${e.lngLat.lng}`);
+    console.log(`クリック位置 (ピクセル): X ${e.point.x}, Y ${e.point.y}`);
+    
+    const features = draw.getAll().features.filter(feature => feature.geometry.type === 'Point');
+    if (features.length > 0) {
+        const nearestFeature = features.reduce((nearest, feature) => {
+            const distance = turf.distance(
+                turf.point(feature.geometry.coordinates),
+                turf.point([e.lngLat.lng, e.lngLat.lat])
+            );
+            return distance < nearest.distance ? { feature, distance } : nearest;
+        }, { feature: null, distance: Infinity });
+
+        if (nearestFeature.feature) {
+            const note = nearestFeature.feature.properties.note || '  ';
+            console.log(`Clicked Feature ID: ${nearestFeature.feature.id}, Note: ${note}`);
+
+            const coords = nearestFeature.feature.geometry.coordinates;
+            const point = map.project(coords); // ポイントフィーチャーの位置に表示
+
+            document.getElementById('note-content').innerText = note;
+            const noteDisplay = document.getElementById('note-display');
+            noteDisplay.style.display = 'block';
+            noteDisplay.style.position = 'absolute';
+            noteDisplay.style.left = `${point.x + 10}px`; // ポイントフィーチャーの少し右に表示
+            noteDisplay.style.top = `${point.y - 10}px`; // ポイントフィーチャーの少し上に表示
+        } else {
+            console.log('No point feature found at clicked point');
+            document.getElementById('note-display').style.display = 'none';
+        }
+    } else {
+        console.log('No feature found at clicked point');
+        document.getElementById('note-display').style.display = 'none';
+    }
+});
+
+       // メモボックスの表示位置を更新するための関数
+        function updateNoteDisplayPosition(lngLat) {
+            const noteDisplay = document.getElementById('note-display');
+            const point = map.project(lngLat);
+            noteDisplay.style.left = `${point.x + 10}px`; // ポイントフィーチャーの少し右に表示
+            noteDisplay.style.top = `${point.y - 10}px`; // ポイントフィーチャーの少し上に表示
+        }
+
+        let noteLngLat = null; // メモボックスの地理座標を保存する変数
+
+        map.on('zoom', () => {
+            if (noteLngLat) {
+                updateNoteDisplayPosition(noteLngLat);
+            }
+        });
+
+        map.on('move', () => {
+            if (noteLngLat) {
+                updateNoteDisplayPosition(noteLngLat);
+            }
+        });
+
+        // 例: ポイントクリック時にメモボックスを表示し、位置を保存する
+        map.on('click', handleMapClick);
+        map.on('touchend', handleMapClick);
+
+        function handleMapClick(e) {
+            const features = draw.getAll().features.filter(feature => feature.geometry.type === 'Point');
+            if (features.length > 0) {
+                const nearestFeature = features.reduce((nearest, feature) => {
+                    const distance = turf.distance(
+                        turf.point(feature.geometry.coordinates),
+                        turf.point([e.lngLat.lng, e.lngLat.lat])
+                    );
+                    return distance < nearest.distance ? { feature, distance } : nearest;
+                }, { feature: null, distance: Infinity });
+
+                if (nearestFeature.feature) {
+                    noteLngLat = nearestFeature.feature.geometry.coordinates;
+                    updateNoteDisplayPosition(noteLngLat);
+                    const note = nearestFeature.feature.properties.note || ' ';
+                    document.getElementById('note-content').innerText = note;
+                    document.getElementById('note-display').style.display = 'block';
+                } else {
+                    document.getElementById('note-display').style.display = 'none';
+                }
+            } else {
+                document.getElementById('note-display').style.display = 'none';
+            }
+        }
+
+    </script>
+</body>
+</html>

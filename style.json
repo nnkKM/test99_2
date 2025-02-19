@@ -1,0 +1,228 @@
+{
+  "version": 8,
+  "name": "Simple OSM",
+  "sources": {
+    "osm-tiles": {
+      "type": "raster",
+      "tiles": [
+        "https://tile.openstreetmap.org/{z}/{x}/{y}.png"
+      ],
+      "minzoom": 1,
+      "maxzoom": 18,
+      "tileSize": 256,
+      "attribution": "© <a href=\"https://www.openstreetmap.org/copyright\" target=\"_blank\">OpenStreetMap</a> contributors"
+    },
+    "population-source": {
+      "type": "vector",
+      "tiles": [
+        "pmtiles://https://data.source.coop/smartmaps/h3ys-worldpop/tha.pmtiles/{z}/{x}/{y}"
+      ],
+      "minzoom": 4,
+      "maxzoom": 12
+    },
+    "PublicTransport-source": {
+      "type": "vector",
+      "tiles": [
+        "pmtiles://http://192.168.163.248:8080/data/output.pmtiles/{z}/{x}/{y}"
+      ],
+      "minzoom": 4,
+      "maxzoom": 14,
+      "attribution": "<a href=\"https://dilimicroletroutes.github.io/\" target=\"_blank\">DiliMicroletRoutes</a> "
+    },
+    "pm25-source": {
+      "type": "vector",
+      "tiles": [
+        "pmtiles://https://nnkhij.github.io/test6/data/PM25.pmtiles/{z}/{x}/{y}"
+      ],
+      "minzoom": 4,
+      "maxzoom": 9,
+      "attribution": "<a href=\"https://inetl-ip.gov.tl/\" target=\"_blank\">Baliza data</a> "
+    }
+  },
+  "layers": [
+    {
+      "id": "osm-layer",
+      "type": "raster",
+      "source": "osm-tiles",
+      "minzoom": 0,
+      "maxzoom": 19,
+      "paint": {
+        "raster-saturation": -0.5
+      }
+    },
+    {
+      "id": "population-fill-layer",
+      "type": "fill",
+      "source": "population-source",
+      "source-layer": "pop",
+      "paint": {
+        "fill-color": [
+          "step",
+          ["zoom"],
+          [
+            "case",
+            ["<=", ["get", "2020"],   16807], "#ffffff",
+            ["<=", ["get", "2020"],   33614], "#ffe3e3",
+            ["<=", ["get", "2020"],   67228], "#ffc6c6",
+            ["<=", ["get", "2020"],  134456], "#ffaaaa",
+            ["<=", ["get", "2020"],  268912], "#ff8e8e",
+            ["<=", ["get", "2020"],  537824], "#ff7171",
+            ["<=", ["get", "2020"], 1075648], "#ff5555",
+            ["<=", ["get", "2020"], 2151296], "#ff3939",
+            ["<=", ["get", "2020"], 4302592], "#ff1c1c",
+            "#ff0000"
+          ],
+          4.1,[
+            "case",
+            ["<=", ["get", "2020"],    2401], "#ffffff",
+            ["<=", ["get", "2020"],    4802], "#ffe3e3",
+            ["<=", ["get", "2020"],    9604], "#ffc6c6",
+            ["<=", ["get", "2020"],   19208], "#ffaaaa",
+            ["<=", ["get", "2020"],   38416], "#ff8e8e",
+            ["<=", ["get", "2020"],   76832], "#ff7171",
+            ["<=", ["get", "2020"],  153664], "#ff5555",
+            ["<=", ["get", "2020"],  307328], "#ff3939",
+            ["<=", ["get", "2020"],  614656], "#ff1c1c",
+            "#ff0000"
+          ],
+          8, [
+            "case",
+            ["<=", ["get", "2020"],     343], "#ffffff",
+            ["<=", ["get", "2020"],     686], "#ffe3e3",
+            ["<=", ["get", "2020"],    1372], "#ffc6c6",
+            ["<=", ["get", "2020"],    2744], "#ffaaaa",
+            ["<=", ["get", "2020"],    5488], "#ff8e8e",
+            ["<=", ["get", "2020"],   10976], "#ff7171",
+            ["<=", ["get", "2020"],   21952], "#ff5555",
+            ["<=", ["get", "2020"],   43904], "#ff3939",
+            ["<=", ["get", "2020"],   87808], "#ff1c1c",
+            "#ff0000"
+          ],
+          10, [
+            "case",
+            ["<=", ["get", "2020"],      49], "#ffffff",
+            ["<=", ["get", "2020"],      98], "#ffe3e3",
+            ["<=", ["get", "2020"],     196], "#ffc6c6",
+            ["<=", ["get", "2020"],     392], "#ffaaaa",
+            ["<=", ["get", "2020"],     784], "#ff8e8e",
+            ["<=", ["get", "2020"],    1568], "#ff7171",
+            ["<=", ["get", "2020"],    3136], "#ff5555",
+            ["<=", ["get", "2020"],    6272], "#ff3939",
+            ["<=", ["get", "2020"],   12544], "#ff1c1c",
+            "#ff0000"
+          ],
+          12, [
+            "case",
+            ["<=", ["get", "2020"],       7], "#ffffff",
+            ["<=", ["get", "2020"],      14], "#ffe3e3",
+            ["<=", ["get", "2020"],      28], "#ffc6c6",
+            ["<=", ["get", "2020"],      56], "#ffaaaa",
+            ["<=", ["get", "2020"],     112], "#ff8e8e",
+            ["<=", ["get", "2020"],     224], "#ff7171",
+            ["<=", ["get", "2020"],     448], "#ff5555",
+            ["<=", ["get", "2020"],     896], "#ff3939",
+            ["<=", ["get", "2020"],    1792], "#ff1c1c",
+            "#ff0000"
+          ]
+        ],
+        "fill-opacity": 0.5
+      }
+    },
+    {
+      "id": "population-outline-layer",
+      "type": "line",
+      "source": "population-source",
+      "source-layer": "pop",
+      "paint": {
+        "line-color": "#c0c0c0",
+        "line-width": [
+        "interpolate",
+        ["linear"],
+        ["zoom"],
+        4, 0.2,
+        14, 1
+      ]
+      }
+    },
+    {
+      "id": "MicroletRoute-line-layer",
+      "type": "line",
+      "source": "PublicTransport-source",
+      "source-layer": "MicroletRoute",
+      "paint": {
+        "line-color": "#000000",
+        "line-width": 3
+      }
+    },
+    {
+      "id": "PublicTransport-points-layer",
+      "type": "circle",
+      "source": "PublicTransport-source",
+      "source-layer": "PublicTransport",
+      "paint": {
+      "circle-radius": [
+        "interpolate",
+        ["linear"],
+        ["zoom"],
+        4, 1,
+        14, 6
+      ],
+        "circle-color": [
+          "match",
+          ["get", "amenity"],
+          "ferry_terminal", "#0000FF",
+          "bus_stop","#00FF00",
+          "bus_staition","#00FF00",
+          "#ff8c00"
+        ],
+        "circle-stroke-width": [
+        "interpolate",
+        ["linear"],
+        ["zoom"],
+        4, 0.2,
+        14, 1
+      ],
+        "circle-stroke-color": "#000000"
+      }
+    },
+    {
+      "id": "MUNICIPIO-outline-layer",
+      "type": "line",
+      "source": "pm25-source",
+      "source-layer": "Municipio",
+      "paint": {
+        "line-color": "#010066",
+        "line-width": 1
+      },
+      "layout": {
+        "visibility": "none"
+      }
+    },
+    {
+      "id": "PostuAdministrativo-outline-layer",
+      "type": "line",
+      "source": "pm25-source",
+      "source-layer": "PostuAdministrativo",
+      "paint": {
+        "line-color": "#010066",
+        "line-width": 0.3
+      },
+      "layout": {
+        "visibility": "none"
+      }
+    },
+    {
+      "id": "Suco-outline-layer",
+      "type": "line",
+      "source": "pm25-source",
+      "source-layer": "Suco",
+      "paint": {
+        "line-color": "#235BC8",
+        "line-width": 0.1
+      },
+      "layout": {
+        "visibility": "none"
+      }
+    }
+  ]
+}
