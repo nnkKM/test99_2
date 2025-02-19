@@ -23,7 +23,7 @@
     "PublicTransport-source": {
       "type": "vector",
       "tiles": [
-        "pmtiles:https://github.com/nnkHIJ/test99/data/output.pmtiles/{z}/{x}/{y}"
+        "pmtiles://https://nnkhij.github.io/test99/data/output.pmtiles/{z}/{x}/{y}"
       ],
       "minzoom": 4,
       "maxzoom": 14,
