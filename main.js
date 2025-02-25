@@ -61,56 +61,150 @@ layerIds.forEach(lyrId => {
 /*******************************************************************
  * 年度ごとの表示切替
  * *************************************************************** */
-// スタイルを動的に更新する関数
 
-// var aSmallpop = [16801, 2401, 343, 49, 7];
 
+// 現在の年を保存する変数
+let currentYear = 2001;
+
+// スライドバーの要素を取得
+const yearSlider = document.getElementById('year-slider');
+const yearValue = document.getElementById('year-value');
+
+// スライドバーが変更されたときのイベントリスナーを追加
+yearSlider.addEventListener('input', (event) => {
+    const selectedYear = event.target.value;
+    yearValue.textContent = selectedYear;
+    updateMapStyle(selectedYear);
+});
+
+var aSmallpop = [16801, 2401, 343, 49, 7];  // 最初の数
+var n = 2;                                  // 何をかけるか
+// // 色を生成する関数
+// function generateColors(base, multiplier, steps, year) {
+//     let colors = [];
+//     for (let i = 0; i < steps; i++) {
+//         let value = base * Math.pow(multiplier, i);
+//         let color = `rgb(${255 - (i * 28)}, ${255 - (i * 28)}, ${255 - (i * 28)})`;
+//         colors.push([["<=", ["get", year], value], color]);
+//     }
+//     colors.push("rgb(255, 0, 0)");  // 最後の色
+//     return colors;
+// }
+
+// // スタイルを動的に更新する関数
 // function updateMapStyle(year) {
 //     if (map.getLayer('pgr-fill-layer')) {
-//       map.setPaintProperty('pgr-fill-layer', 'fill-color', [
-//         "step",
-//         ["zoom"],
-//         [
-//           "case",
-//           ["<=", ["get", year], 16807], "#ffffff",
-//           ["<=", ["get", year], 33614], "#ffe3e3",
-//           ["<=", ["get", year], 67228], "#ffc6c6",
-//           ["<=", ["get", year], 134456], "#ffaaaa",
-//           ["<=", ["get", year], 268912], "#ff8e8e",
-//           ["<=", ["get", year], 537824], "#ff7171",
-//           ["<=", ["get", year], 1075648], "#ff5555",
-//           ["<=", ["get", year], 2151296], "#ff3939",
-//           ["<=", ["get", year], 4302592], "#ff1c1c",
-//           "#ff0000"
-//         ],
-//         4.1, [
-//           "case",
-//           ["<=", ["get", year], 2401], "#ffffff",
-//           ["<=", ["get", year], 4802], "#ffe3e3",
-//           ["<=", ["get", year], 9604], "#ffc6c6",
-//           ["<=", ["get", year], 19208], "#ffaaaa",
-//           ["<=", ["get", year], 38416], "#ff8e8e",
-//           ["<=", ["get", year], 76832], "#ff7171",
-//           ["<=", ["get", year], 153664], "#ff5555",
-//           ["<=", ["get", year], 307328], "#ff3939",
-//           ["<=", ["get", year], 614656], "#ff1c1c",
-//           "#ff0000"
-//         ],
-//         8, [
-//           "case",
-//           ["<=", ["get", year], 343], "#ffffff",
-//           ["<=", ["get", year], 686], "#ffe3e3",
-//           ["<=", ["get", year], 1372], "#ffc6c6",
-//           ["<=", ["get", year], 2744], "#ffaaaa",
-//           ["<=", ["get", year], 5488], "#ff8e8e",
-//           ["<=", ["get", year], 10976], "#ff7171",
-//           ["<=", ["get", year], 21952], "#ff5555",
-//           ["<=", ["get", year], 43904], "#ff3939",
-//           ["<=", ["get", year], 87808], "#ff1c1c",
-//           "#ff0000"
-//         ]
-//       ]);
+//         let expressions = [3, 4.1, 8, 10, 12].map((zoom, index) => {
+//             return [zoom, ["case", ...generateColors(aSmallpop[index], n, 9, year).flat()]];
+//         });
+
+//         map.setPaintProperty('pgr-fill-layer', 'fill-color', [
+//             "step",
+//             ["zoom"],
+//             ...expressions.flat()
+//         ]);
 //     }
+// }
+// スタイルを動的に更新する関数
+function updateMapStyle(year) {
+    if (map.getLayer('pgr-fill-layer')) {
+        map.setPaintProperty('pgr-fill-layer', 'fill-color', [
+            "step",
+            ["zoom"],
+            [
+                "case",
+                ["<=", ["get", year],   aSmallpop[0]], "rgb(255, 255, 255)",
+                ["<=", ["get", year],   aSmallpop[0]*n], "rgb(255, 227, 227)",
+                ["<=", ["get", year],   aSmallpop[0]*n*n], "rgb(255, 198, 198)",
+                ["<=", ["get", year],  aSmallpop[0]*n*n*n], "rgb(255, 170, 170)",
+                ["<=", ["get", year],  aSmallpop[0]*n*n*n*n], "rgb(255, 142, 142)",
+                ["<=", ["get", year],  aSmallpop[0]*n*n*n*n*n], "rgb(255, 113, 113)",
+                ["<=", ["get", year], aSmallpop[0]*n*n*n*n*n*n], "rgb(255, 85, 85)",
+                ["<=", ["get", year], aSmallpop[0]*n*n*n*n*n*n*n], "rgb(255, 57, 57)",
+                ["<=", ["get", year], aSmallpop[0]*n*n*n*n*n*n*n*n], "rgb(255, 28, 28)",
+                "rgb(255, 0, 0)"
+            ],
+            4.1, [
+                "case",
+                ["<=", ["get", year],   aSmallpop[1]], "rgb(255, 255, 255)",
+                ["<=", ["get", year],   aSmallpop[1]*n], "rgb(255, 227, 227)",
+                ["<=", ["get", year],   aSmallpop[1]*n*n], "rgb(255, 198, 198)",
+                ["<=", ["get", year],  aSmallpop[1]*n*n*n], "rgb(255, 170, 170)",
+                ["<=", ["get", year],  aSmallpop[1]*n*n*n*n], "rgb(255, 142, 142)",
+                ["<=", ["get", year],  aSmallpop[1]*n*n*n*n*n], "rgb(255, 113, 113)",
+                ["<=", ["get", year], aSmallpop[1]*n*n*n*n*n*n], "rgb(255, 85, 85)",
+                ["<=", ["get", year], aSmallpop[1]*n*n*n*n*n*n*n], "rgb(255, 57, 57)",
+                ["<=", ["get", year], aSmallpop[1]*n*n*n*n*n*n*n*n], "rgb(255, 28, 28)",
+                "rgb(255, 0, 0)"
+            ],
+            8, [
+                "case",
+                ["<=", ["get", year],   aSmallpop[2]], "rgb(255, 255, 255)",
+                ["<=", ["get", year],   aSmallpop[2]*n], "rgb(255, 227, 227)",
+                ["<=", ["get", year],   aSmallpop[2]*n*n], "rgb(255, 198, 198)",
+                ["<=", ["get", year],  aSmallpop[2]*n*n*n], "rgb(255, 170, 170)",
+                ["<=", ["get", year],  aSmallpop[2]*n*n*n*n], "rgb(255, 142, 142)",
+                ["<=", ["get", year],  aSmallpop[2]*n*n*n*n*n], "rgb(255, 113, 113)",
+                ["<=", ["get", year], aSmallpop[2]*n*n*n*n*n*n], "rgb(255, 85, 85)",
+                ["<=", ["get", year], aSmallpop[2]*n*n*n*n*n*n*n], "rgb(255, 57, 57)",
+                ["<=", ["get", year], aSmallpop[2]*n*n*n*n*n*n*n*n], "rgb(255, 28, 28)",
+                "rgb(255, 0, 0)"
+            ],
+            10, [
+                "case",
+                ["<=", ["get", year],   aSmallpop[3]], "rgb(255, 255, 255)",
+                ["<=", ["get", year],   aSmallpop[3]*n], "rgb(255, 227, 227)",
+                ["<=", ["get", year],   aSmallpop[3]*n*n], "rgb(255, 198, 198)",
+                ["<=", ["get", year],  aSmallpop[3]*n*n*n], "rgb(255, 170, 170)",
+                ["<=", ["get", year],  aSmallpop[3]*n*n*n*n], "rgb(255, 142, 142)",
+                ["<=", ["get", year],  aSmallpop[3]*n*n*n*n*n], "rgb(255, 113, 113)",
+                ["<=", ["get", year], aSmallpop[3]*n*n*n*n*n*n], "rgb(255, 85, 85)",
+                ["<=", ["get", year], aSmallpop[3]*n*n*n*n*n*n*n], "rgb(255, 57, 57)",
+                ["<=", ["get", year], aSmallpop[3]*n*n*n*n*n*n*n*n], "rgb(255, 28, 28)",
+                "rgb(255, 0, 0)"
+            ],
+            12, [
+                "case",
+                ["<=", ["get", year],   aSmallpop[4]], "rgb(255, 255, 255)",
+                ["<=", ["get", year],   aSmallpop[4]*n], "rgb(255, 227, 227)",
+                ["<=", ["get", year],   aSmallpop[4]*n*n], "rgb(255, 198, 198)",
+                ["<=", ["get", year],  aSmallpop[4]*n*n*n], "rgb(255, 170, 170)",
+                ["<=", ["get", year],  aSmallpop[4]*n*n*n*n], "rgb(255, 142, 142)",
+                ["<=", ["get", year],  aSmallpop[4]*n*n*n*n*n], "rgb(255, 113, 113)",
+                ["<=", ["get", year], aSmallpop[4]*n*n*n*n*n*n], "rgb(255, 85, 85)",
+                ["<=", ["get", year], aSmallpop[4]*n*n*n*n*n*n*n], "rgb(255, 57, 57)",
+                ["<=", ["get", year], aSmallpop[4]*n*n*n*n*n*n*n*n], "rgb(255, 28, 28)",
+                "rgb(255, 0, 0)"
+            ]
+        ]);
+    }
+}
+
+// 参考：藤村さん作成色作成関数
+// const opacity = (y) => {
+//   return ["min", 1.0, ["/", ["log10", ["+", 1, ["get", String(y)]]], 5.0]]
+// }
+// const color = (y) => {
+//   return ["case",
+//     ["any", ["<", ["get", String(y)], 500], ["<", ["get", String(y - 1)], 500]],
+//     "#888888",
+//     [
+//       "interpolate-hcl",
+//       ["linear"],
+//       ["-", ["ln", ["get", String(y)]], ["ln", ["get", String(y - 1)]]],
+//       -0.2, "rgb(39,42,149)",
+//       -0.15, "rgb(39,42,197)",
+//       -0.1, "rgb(39,42,246)",
+//       -0.05,"rgb(141,144,249)",
+//       0, "rgb(243,246,255)",
+//       0.05, "rgb(243,246,117)",
+//       0.1, "rgb(230,151,92)",
+//       0.15, "rgb(226,83,79)",
+//       0.2, "rgb(226,83,153)",
+//       0.25, "rgb(226,83,249)"
+//     ]
+//   ]
+// }
 
 
 /*******************************************************************
@@ -155,7 +249,7 @@ document.getElementById('save-note-btn').addEventListener('click', () => {
 });
 
 map.on('draw.create', function (e) {
-    const feature = e.features[0];
+    const feature = e.features[2];
     if (feature.geometry.type === 'Point') {
         selectedFeatureId = feature.id;
         console.log(`Created Feature ID: ${selectedFeatureId}`);
@@ -164,7 +258,7 @@ map.on('draw.create', function (e) {
 });
 
 map.on('draw.update', function (e) {
-    const feature = e.features[0];
+    const feature = e.features[2];
     if (feature.geometry.type === 'Point') {
         selectedFeatureId = feature.id;
         console.log(`Updated Feature ID: ${selectedFeatureId}`);
@@ -262,4 +356,3 @@ function handleMapClick(e) {
         document.getElementById('note-display').style.display = 'none';
     }
 }
-
