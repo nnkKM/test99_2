@@ -268,8 +268,8 @@ map.on('draw.update', function (e) {
 
 
 map.on('click', (e) => {
-    // console.log(`クリック位置: 緯度 ${e.lngLat.lat}, 経度 ${e.lngLat.lng}`);
-    // console.log(`クリック位置 (ピクセル): X ${e.point.x}, Y ${e.point.y}`);
+    console.log(`クリック位置: 緯度 ${e.lngLat.lat}, 経度 ${e.lngLat.lng}`);
+    console.log(`クリック位置 (ピクセル): X ${e.point.x}, Y ${e.point.y}`);
 
     const features = draw.getAll().features.filter(feature => feature.geometry.type === 'Point');
     if (features.length > 0) {
