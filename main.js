@@ -249,7 +249,7 @@ document.getElementById('save-note-btn').addEventListener('click', () => {
 });
 
 map.on('draw.create', function (e) {
-    const feature = e.features[2];
+    const feature = e.features[0];
     if (feature.geometry.type === 'Point') {
         selectedFeatureId = feature.id;
         console.log(`Created Feature ID: ${selectedFeatureId}`);
@@ -258,7 +258,7 @@ map.on('draw.create', function (e) {
 });
 
 map.on('draw.update', function (e) {
-    const feature = e.features[2];
+    const feature = e.features[0];
     if (feature.geometry.type === 'Point') {
         selectedFeatureId = feature.id;
         console.log(`Updated Feature ID: ${selectedFeatureId}`);
