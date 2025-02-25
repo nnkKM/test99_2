@@ -12,7 +12,7 @@
       "tileSize": 256,
       "attribution": "© <a href=\"https://www.openstreetmap.org/copyright\" target=\"_blank\">OpenStreetMap</a> contributors"
     },
-    "population-source": {
+    "pgr-source": {
       "type": "vector",
       "tiles": [
         "pmtiles://https://data.source.coop/smartmaps/h3ys-worldpop/tha.pmtiles/{z}/{x}/{y}"
@@ -26,17 +26,7 @@
         "pmtiles://https://nnkhij.github.io/test99/data/output.pmtiles/{z}/{x}/{y}"
       ],
       "minzoom": 4,
-      "maxzoom": 14,
-      "attribution": "<a href=\"https://dilimicroletroutes.github.io/\" target=\"_blank\">DiliMicroletRoutes</a> "
-    },
-    "pm25-source": {
-      "type": "vector",
-      "tiles": [
-        "pmtiles://https://nnkhij.github.io/test6/data/PM25.pmtiles/{z}/{x}/{y}"
-      ],
-      "minzoom": 4,
-      "maxzoom": 9,
-      "attribution": "<a href=\"https://inetl-ip.gov.tl/\" target=\"_blank\">Baliza data</a> "
+      "maxzoom": 14
     }
   },
   "layers": [
@@ -51,9 +41,9 @@
       }
     },
     {
-      "id": "population-fill-layer",
+      "id": "pgr-fill-layer",
       "type": "fill",
-      "source": "population-source",
+      "source": "pgr-source",
       "source-layer": "pop",
       "paint": {
         "fill-color": [
@@ -129,9 +119,9 @@
       }
     },
     {
-      "id": "population-outline-layer",
+      "id": "pgr-outline-layer",
       "type": "line",
-      "source": "population-source",
+      "source": "pgr-source",
       "source-layer": "pop",
       "paint": {
         "line-color": "#c0c0c0",
@@ -142,16 +132,6 @@
         4, 0.2,
         14, 1
       ]
-      }
-    },
-    {
-      "id": "MicroletRoute-line-layer",
-      "type": "line",
-      "source": "PublicTransport-source",
-      "source-layer": "MicroletRoute",
-      "paint": {
-        "line-color": "#000000",
-        "line-width": 3
       }
     },
     {
@@ -183,45 +163,6 @@
         14, 1
       ],
         "circle-stroke-color": "#000000"
-      }
-    },
-    {
-      "id": "MUNICIPIO-outline-layer",
-      "type": "line",
-      "source": "pm25-source",
-      "source-layer": "Municipio",
-      "paint": {
-        "line-color": "#010066",
-        "line-width": 1
-      },
-      "layout": {
-        "visibility": "none"
-      }
-    },
-    {
-      "id": "PostuAdministrativo-outline-layer",
-      "type": "line",
-      "source": "pm25-source",
-      "source-layer": "PostuAdministrativo",
-      "paint": {
-        "line-color": "#010066",
-        "line-width": 0.3
-      },
-      "layout": {
-        "visibility": "none"
-      }
-    },
-    {
-      "id": "Suco-outline-layer",
-      "type": "line",
-      "source": "pm25-source",
-      "source-layer": "Suco",
-      "paint": {
-        "line-color": "#235BC8",
-        "line-width": 0.1
-      },
-      "layout": {
-        "visibility": "none"
       }
     }
   ]
