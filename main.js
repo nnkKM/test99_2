@@ -10,7 +10,6 @@ const map = new maplibregl.Map({
     center: [100.53, 13.75],
     zoom: 8
 });
-
 map.addControl(new maplibregl.NavigationControl());
 
 /*******************************************************************
@@ -326,6 +325,10 @@ map.on('move', () => {
     if (noteLngLat) {
         updateNoteDisplayPosition(noteLngLat);
     }
+});
+
+map.on('load', () => {
+    updateMapStyle("2020");
 });
 
 // 例: ポイントクリック時にメモボックスを表示し、位置を保存する
