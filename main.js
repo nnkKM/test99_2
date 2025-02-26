@@ -12,6 +12,14 @@ const map = new maplibregl.Map({
 });
 map.addControl(new maplibregl.NavigationControl());
 
+// 最初に2020年をセット
+map.on('load', () => {
+    updateMapStyle_pop("2020");
+    updateMapStyle_pgr("2020");
+    updateMapStyle_pgr2("2020");
+});
+
+
 /*******************************************************************
  * レイヤON/OFF
  * *************************************************************** */
@@ -20,6 +28,18 @@ const layerIds = [
     'osm-layer',
     'PublicTransport-points-layer'
 ];
+
+document.querySelector('#population-all-fill-layer-chk').addEventListener('change', () => {
+    const isChecked = document.getElementById('population-all-fill-layer-chk').checked;
+    const fillLayerIds = ['population-fill-layer', 'population-outline-layer'];
+    fillLayerIds.forEach(id => {
+        if (isChecked) {
+            map.setLayoutProperty(id, 'visibility', 'visible');
+        } else {
+            map.setLayoutProperty(id, 'visibility', 'none');
+        }
+    });
+});
 
 document.querySelector('#pgr-all-fill-layer-chk').addEventListener('change', () => {
     const isChecked = document.getElementById('pgr-all-fill-layer-chk').checked;
@@ -32,6 +52,19 @@ document.querySelector('#pgr-all-fill-layer-chk').addEventListener('change', () 
         }
     });
 });
+
+document.querySelector('#pgr2-all-fill-layer-chk').addEventListener('change', () => {
+    const isChecked = document.getElementById('pgr2-all-fill-layer-chk').checked;
+    const fillLayerIds = ['pgr2-fill-layer', 'pgr2-outline-layer'];
+    fillLayerIds.forEach(id => {
+        if (isChecked) {
+            map.setLayoutProperty(id, 'visibility', 'visible');
+        } else {
+            map.setLayoutProperty(id, 'visibility', 'none');
+        }
+    });
+});
+
 
 document.querySelector('#toggle-layers-btn').addEventListener('click', () => {
     const layersContainer = document.getElementById('layers-container');
@@ -73,9 +106,12 @@ const yearValue = document.getElementById('year-value');
 yearSlider.addEventListener('input', (event) => {
     const selectedYear = event.target.value;
     yearValue.textContent = selectedYear;
-    updateMapStyle(selectedYear);
+    updateMapStyle_pop(selectedYear);
+    updateMapStyle_pgr(selectedYear);
+    updateMapStyle_pgr2(selectedYear);
 });
 
+// 数字 = aSmallpop * (n ^ k) (k=1, 2, 3...)
 var aSmallpop = [16801, 2401, 343, 49, 7];  // 最初の数
 var n = 2;                                  // 何をかけるか
 // // 色を生成する関数
@@ -91,13 +127,13 @@ var n = 2;                                  // 何をかけるか
 // }
 
 // // スタイルを動的に更新する関数
-// function updateMapStyle(year) {
-//     if (map.getLayer('pgr-fill-layer')) {
+// function updateMapStyle_pop(year) {
+//     if (map.getLayer('population-fill-layer')) {
 //         let expressions = [3, 4.1, 8, 10, 12].map((zoom, index) => {
 //             return [zoom, ["case", ...generateColors(aSmallpop[index], n, 9, year).flat()]];
 //         });
 
-//         map.setPaintProperty('pgr-fill-layer', 'fill-color', [
+//         map.setPaintProperty('population-fill-layer', 'fill-color', [
 //             "step",
 //             ["zoom"],
 //             ...expressions.flat()
@@ -105,9 +141,9 @@ var n = 2;                                  // 何をかけるか
 //     }
 // }
 // スタイルを動的に更新する関数
-function updateMapStyle(year) {
-    if (map.getLayer('pgr-fill-layer')) {
-        map.setPaintProperty('pgr-fill-layer', 'fill-color', [
+function updateMapStyle_pop(year) {
+    if (map.getLayer('population-fill-layer')) {
+        map.setPaintProperty('population-fill-layer', 'fill-color', [
             "step",
             ["zoom"],
             [
@@ -179,31 +215,66 @@ function updateMapStyle(year) {
     }
 }
 
+function updateMapStyle_pgr(year) {
+    if (map.getLayer('pgr-fill-layer')) {
+        map.setPaintProperty('pgr-fill-layer', 'fill-color', color_pgr(year));
+    }
+}
+function updateMapStyle_pgr2(year) {
+    if (map.getLayer('pgr2-fill-layer')) {
+        map.setPaintProperty('pgr2-fill-layer', 'fill-color', color_pgr2(year));
+    }
+}
+
+
 // 参考：藤村さん作成色作成関数
 // const opacity = (y) => {
 //   return ["min", 1.0, ["/", ["log10", ["+", 1, ["get", String(y)]]], 5.0]]
 // }
-// const color = (y) => {
-//   return ["case",
-//     ["any", ["<", ["get", String(y)], 500], ["<", ["get", String(y - 1)], 500]],
-//     "#888888",
-//     [
-//       "interpolate-hcl",
-//       ["linear"],
-//       ["-", ["ln", ["get", String(y)]], ["ln", ["get", String(y - 1)]]],
-//       -0.2, "rgb(39,42,149)",
-//       -0.15, "rgb(39,42,197)",
-//       -0.1, "rgb(39,42,246)",
-//       -0.05,"rgb(141,144,249)",
-//       0, "rgb(243,246,255)",
-//       0.05, "rgb(243,246,117)",
-//       0.1, "rgb(230,151,92)",
-//       0.15, "rgb(226,83,79)",
-//       0.2, "rgb(226,83,153)",
-//       0.25, "rgb(226,83,249)"
-//     ]
-//   ]
-// }
+const color_pgr = (y) => {
+  return ["case",
+    ["any", ["<", ["get", String(y)], 500], ["<", ["get", String(y - 1)], 500]],
+    "#888888",
+    [
+      "interpolate-hcl",
+      ["linear"],
+      ["-", ["ln", ["get", String(y)]], ["ln", ["get", String(y - 1)]]],
+      -0.2, "rgb(39,42,149)",
+      -0.15, "rgb(39,42,197)",
+      -0.1, "rgb(39,42,246)",
+      -0.05,"rgb(141,144,249)",
+      0, "rgb(243,246,255)",
+      0.05, "rgb(243,246,117)",
+      0.1, "rgb(230,151,92)",
+      0.15, "rgb(226,83,79)",
+      0.2, "rgb(226,83,153)",
+      0.25, "rgb(226,83,249)"
+    ]
+  ]
+}
+
+const color_pgr2 = (y) => {
+    return ["case",
+      ["any", ["<", ["get", String(2020)], 500], ["<", ["get", String(y)], 500]],
+      "#888888",
+      [
+        "interpolate-hcl",
+        ["linear"],
+        ["-", ["ln", ["get", String(2020)]], ["ln", ["get", String(y)]]],
+        -0.2, "rgb(39,42,149)",
+        -0.15, "rgb(39,42,197)",
+        -0.1, "rgb(39,42,246)",
+        -0.05,"rgb(141,144,249)",
+        0, "rgb(243,246,255)",
+        0.05, "rgb(243,246,117)",
+        0.1, "rgb(230,151,92)",
+        0.15, "rgb(226,83,79)",
+        0.2, "rgb(226,83,153)",
+        0.25, "rgb(226,83,249)"
+      ]
+    ]
+  }
+  
 
 
 /*******************************************************************
@@ -327,9 +398,6 @@ map.on('move', () => {
     }
 });
 
-map.on('load', () => {
-    updateMapStyle("2020");
-});
 
 // 例: ポイントクリック時にメモボックスを表示し、位置を保存する
 map.on('click', handleMapClick);
