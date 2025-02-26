@@ -12,7 +12,7 @@
       "tileSize": 256,
       "attribution": "© <a href=\"https://www.openstreetmap.org/copyright\" target=\"_blank\">OpenStreetMap</a> contributors"
     },
-    "pgr-source": {
+    "population-source": {
       "type": "vector",
       "tiles": [
         "pmtiles://https://data.source.coop/smartmaps/h3ys-worldpop/tha.pmtiles/{z}/{x}/{y}"
@@ -41,9 +41,35 @@
       }
     },
     {
+      "id": "population-fill-layer",
+      "type": "fill",
+      "source": "population-source",
+      "source-layer": "pop",
+      "paint": {
+        "fill-color": "#ffffff",
+        "fill-opacity": 0.5
+      }
+    },
+    {
+      "id": "population-outline-layer",
+      "type": "line",
+      "source": "population-source",
+      "source-layer": "pop",
+      "paint": {
+        "line-color": "#c0c0c0",
+        "line-width": [
+        "interpolate",
+        ["linear"],
+        ["zoom"],
+        4, 0.2,
+        14, 1
+      ]
+      }
+    },
+    {
       "id": "pgr-fill-layer",
       "type": "fill",
-      "source": "pgr-source",
+      "source": "population-source",
       "source-layer": "pop",
       "paint": {
         "fill-color": "#ffffff",
@@ -53,7 +79,33 @@
     {
       "id": "pgr-outline-layer",
       "type": "line",
-      "source": "pgr-source",
+      "source": "population-source",
+      "source-layer": "pop",
+      "paint": {
+        "line-color": "#c0c0c0",
+        "line-width": [
+        "interpolate",
+        ["linear"],
+        ["zoom"],
+        4, 0.2,
+        14, 1
+      ]
+      }
+    },
+    {
+      "id": "pgr2-fill-layer",
+      "type": "fill",
+      "source": "population-source",
+      "source-layer": "pop",
+      "paint": {
+        "fill-color": "#ffffff",
+        "fill-opacity": 0.5
+      }
+    },
+    {
+      "id": "pgr2-outline-layer",
+      "type": "line",
+      "source": "population-source",
       "source-layer": "pop",
       "paint": {
         "line-color": "#c0c0c0",
