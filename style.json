@@ -93,32 +93,6 @@
       }
     },
     {
-      "id": "pgr2-fill-layer",
-      "type": "fill",
-      "source": "population-source",
-      "source-layer": "pop",
-      "paint": {
-        "fill-color": "#ffffff",
-        "fill-opacity": 0.5
-      }
-    },
-    {
-      "id": "pgr2-outline-layer",
-      "type": "line",
-      "source": "population-source",
-      "source-layer": "pop",
-      "paint": {
-        "line-color": "#c0c0c0",
-        "line-width": [
-        "interpolate",
-        ["linear"],
-        ["zoom"],
-        4, 0.2,
-        14, 1
-      ]
-      }
-    },
-    {
       "id": "PublicTransport-points-layer",
       "type": "circle",
       "source": "PublicTransport-source",
