@@ -15,7 +15,7 @@ map.addControl(new maplibregl.NavigationControl());
 // デフォルトの年数をセット
 map.on('load', () => {
     updateMapStyle_pop("2020");
-    updateMapStyle_pgr("2019");
+    updateMapStyle_popchange("2019");
 });
 
 
@@ -42,9 +42,9 @@ document.querySelector('#population-all-fill-layer-chk').addEventListener('chang
     });
 });
 
-document.querySelector('#pgr-all-fill-layer-chk').addEventListener('change', () => {
-    const isChecked = document.getElementById('pgr-all-fill-layer-chk').checked;
-    const fillLayerIds = ['pgr-fill-layer', 'pgr-outline-layer'];
+document.querySelector('#popchange-all-fill-layer-chk').addEventListener('change', () => {
+    const isChecked = document.getElementById('popchange-all-fill-layer-chk').checked;
+    const fillLayerIds = ['popchange-fill-layer', 'popchange-outline-layer'];
     fillLayerIds.forEach(id => {
         if (isChecked) {
             map.setLayoutProperty(id, 'visibility', 'visible');
@@ -89,8 +89,8 @@ let currentYear = 2001;
 // スライドバーの要素を取得
 const yearSliderPop = document.getElementById('year-slider-pop');
 const yearValuePop = document.getElementById('year-value-pop');
-const yearSliderPgr = document.getElementById('year-slider-pgr');
-const yearValuePgr = document.getElementById('year-value-pgr');
+const yearSliderpopchange = document.getElementById('year-slider-popchange');
+const yearValuepopchange = document.getElementById('year-value-popchange');
 
 
 // スライドバーが変更されたときのイベント
@@ -100,10 +100,10 @@ yearSliderPop.addEventListener('input', (event) => {
     updateMapStyle_pop(selectedYear);           // 色の設定の関数を実行
 });
 
-yearSliderPgr.addEventListener('input', (event) => {
+yearSliderpopchange.addEventListener('input', (event) => {
     const selectedYear = event.target.value;
-    yearValuePgr.textContent = selectedYear;
-    updateMapStyle_pgr(selectedYear);
+    yearValuepopchange.textContent = selectedYear;
+    updateMapStyle_popchange(selectedYear);
 });
 
 
@@ -168,7 +168,7 @@ function updateMapStyle_pop(year) {
                 ["<=", ["get", year],  aSmallpop[3]*n*n*n*n*n], "rgb(255, 113, 113)",
                 ["<=", ["get", year], aSmallpop[3]*n*n*n*n*n*n], "rgb(255, 85, 85)",
                 ["<=", ["get", year], aSmallpop[3]*n*n*n*n*n*n*n], "rgb(255, 57, 57)",
-                ["<=", ["get", year], aSmallpop[3]*n*n*n*n*n*n*n*n], "rgb(255, 28, 28)",
+                ["<=", ["get", year], aSmallpop[3]*n*n*n*n*n*n*n*n], "rgb(255, 28, 247)",
                 "rgb(255, 0, 0)"
             ],
             12, [
@@ -189,40 +189,133 @@ function updateMapStyle_pop(year) {
 }
 
 // 色を設定する関数、yearの値によって色が変わる
-function updateMapStyle_pgr(year) {
-    if (map.getLayer('pgr-fill-layer')) {
-        map.setPaintProperty('pgr-fill-layer', 'fill-color', color_pgr(year));  // 具体的な色の指定はcolor_pgrでしている
+function updateMapStyle_popchange(year) {
+    if (map.getLayer('popchange-fill-layer')) {
+        map.setPaintProperty('popchange-fill-layer', 'fill-color', color_popchange(year));  // 具体的な色の指定はcolor_popchangeでしている
     }
 }
 
-// 色の指定をしている、上の関数でyにはyearの値を入れる
-const color_pgr = (y) => {
+// // 色の指定をしている、上の関数でyにはyearの値を入れる
+const color_popchange = (y) => {
 
     // zoomレベルの値を取得
-    const zoom = map.getZoom().toFixed(2);
+    var zoom = map.getZoom().toFixed(2);
+    // zuumレベルによってかわる係数、ここをいい感じの値に調節すると↓に全部反映される
+    var zoomcoef = 2;    // 例）0.1、1、2など
+    if (zoom < 5) {
+        zoomcoef = zoomcoef * 1;
+    } else if (zoom < 8) {
+        zoomcoef = zoomcoef * 4.9;
+    } else if (zoom < 10) {
+        zoomcoef = zoomcoef * 4.9 * 7;
+    } else if (zoom < 12) {
+        zoomcoef = zoomcoef * 4.9 * 7 * 7;
+    } else {
+        zoomcoef = zoomcoef * 4.9 * 7 * 7 * 7;
+    }
 
+    console.log(zoomcoef);
     // 色のパターンを設定
-    return ["case",
-    　// 人口が1未満の時は灰色（消すとエラー出る）
-      ["any", ["<", ["get", String(2020)], 1], ["<", ["get", String(y)], 1]],
-      "#888888",
-      [
+    return [
+    　// 人口が1未満の時は灰色（消すとやっぱりなぜかエラー出る）
         "interpolate-hcl",  // グラデーションを自動で付けるものらしい
         ["linear"],  // グラデーションを自動で付けるものらしい
         ["-", ["get", String(2020)], ["get", String(y)]], // 2020年との人口の値の差   
-        -1000000 / zoom, "rgb(0, 0, 255)",  // zoomの値にかけたり足したりして良い感じの数字に調整できる
-        -100000 / zoom, "rgb(60, 60, 255)",
-        -10000 / zoom, "rgb(120, 120, 255)",
-        -1000 / zoom,"rgb(180, 180, 255)",
-        0, "rgb(243,246,255)",
-        1000 / zoom, "rgb(255, 180, 180)",
-        10000 / zoom, "rgb(255, 120, 120)",
-        100000 / zoom, "rgb(255, 60, 60)",
-        1000000 / zoom, "rgb(255, 0, 0)",
-        10000000 / zoom, "rgb(200, 0, 80)"
-      ]
+        -10000000 / zoomcoef, "rgb(0, 0, 255)",
+        -1000000 / zoomcoef, "rgb(60, 60, 255)",
+        -100000 / zoomcoef, "rgb(120, 120, 255)",
+        -10000 / zoomcoef,"rgb(180, 180, 255)",
+        0, "rgb(255, 255, 255)",
+        10000 / zoomcoef, "rgb(255, 180, 180)",
+        100000 / zoomcoef, "rgb(255, 120, 120)",
+        1000000 / zoomcoef, "rgb(255, 60, 60)",
+        10000000 / zoomcoef, "rgb(255, 0, 0)",
+        100000000 / zoomcoef, "rgb(200, 0, 80)"
     ]
-  }
+}
+
+//   const color_popchange = (y) => {
+//     return [
+//         "step",
+//         ["zoom"],
+//         [
+//             "step",
+//             ["-", ["get", String(2020)], ["get", String(y)]],
+//                   "rgb(0, 0, 255)", 
+//            -84035,"rgb(51, 102, 255)", 
+//            -67228,"rgb(102, 153, 255)",
+//            -50421,"rgb(153, 204, 255)",
+//            -33614,"rgb(204, 229, 255)",
+//            -16807,"rgb(255, 255, 255)",
+//            16807 ,"rgb(255, 204, 204)",
+//            33614 ,"rgb(255, 153, 153)",
+//            50421 ,"rgb(255, 102, 102)",
+//            67228 ,"rgb(255, 51, 51)",
+//            84035 ,"rgb(255, 0, 0)"
+//         ],
+//         5,[
+//             "step",
+//             ["-", ["get", String(2020)], ["get", String(y)]],
+//                   "rgb(0, 0, 255)", 
+//             -17150,"rgb(51, 102, 255)", 
+//             -13720,"rgb(102, 153, 255)",
+//             -10290,"rgb(153, 204, 255)",
+//             -6860 ,"rgb(204, 229, 255)",
+//             -3430 ,"rgb(255, 255, 255)",
+//             3430  ,"rgb(255, 204, 204)",
+//             6860  ,"rgb(255, 153, 153)",
+//             10290 ,"rgb(255, 102, 102)",
+//             13720 ,"rgb(255, 51, 51)",
+//             17150 ,"rgb(255, 0, 0)"
+//         ],
+//         8,[
+//             "step",
+//             ["-", ["get", String(2020)], ["get", String(y)]],
+//                   "rgb(0, 0, 255)", 
+//             -2450,"rgb(51, 102, 255)", 
+//             -1960,"rgb(102, 153, 255)",
+//             -1470,"rgb(153, 204, 255)",
+//             -980 ,"rgb(204, 229, 255)",
+//             -490 ,"rgb(255, 255, 255)",
+//             490  ,"rgb(255, 204, 204)",
+//             980  ,"rgb(255, 153, 153)",
+//             1470 ,"rgb(255, 102, 102)",
+//             1960 ,"rgb(255, 51, 51)",
+//             2450 ,"rgb(255, 0, 0)"
+//         ],
+//         10, [
+//             "step",
+//             ["-", ["get", String(2020)], ["get", String(y)]],
+//                  "rgb(0, 0, 255)", 
+//             -350,"rgb(51, 102, 255)", 
+//             -280,"rgb(102, 153, 255)",
+//             -210,"rgb(153, 204, 255)",
+//             -140,"rgb(204, 229, 255)",
+//              -70,"rgb(255, 255, 255)",
+//               70,"rgb(255, 204, 204)",
+//              140,"rgb(255, 153, 153)",
+//              210,"rgb(255, 102, 102)",
+//              280,"rgb(255, 51, 51)",  
+//              350,"rgb(255, 0, 0)" 
+//         ],
+//         12, [
+//             "step",
+//             ["-", ["get", String(2020)], ["get", String(y)]],
+//                 "rgb(0, 0, 255)",
+//             -50,"rgb(51, 102, 255)",
+//             -40,"rgb(102, 153, 255)",
+//             -30,"rgb(153, 204, 255)",
+//             -20,"rgb(204, 229, 255)",
+//             -10,"rgb(255, 255, 255)",
+//              10,"rgb(255, 204, 204)",
+//              20,"rgb(255, 153, 153)",
+//              30,"rgb(255, 102, 102)",
+//              40,"rgb(255, 51, 51)",
+//              50,"rgb(255, 0, 0)" 
+//         ]
+//     ];
+// }
+
   
 // 参考：藤村さん作成色作成関数
 // const opacity = (y) => {
@@ -263,6 +356,18 @@ const updateZoomLevel = () => {
 
 map.on('zoom', updateZoomLevel);
 updateZoomLevel();
+
+
+/*******************************************************************
+ * スケール表示
+ * *************************************************************** */
+const scale = new maplibregl.ScaleControl({
+    maxWidth: 80,
+    unit: 'metric'
+});
+map.addControl(scale, 'bottom-right');
+
+
 
 /*******************************************************************
  * メモ機能
