@@ -67,7 +67,7 @@
       }
     },
     {
-      "id": "pgr-fill-layer",
+      "id": "popchange-fill-layer",
       "type": "fill",
       "source": "population-source",
       "source-layer": "pop",
@@ -77,7 +77,7 @@
       }
     },
     {
-      "id": "pgr-outline-layer",
+      "id": "popchange-outline-layer",
       "type": "line",
       "source": "population-source",
       "source-layer": "pop",
