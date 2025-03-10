@@ -110,7 +110,7 @@
           ["get", "amenity"],
           "ferry_terminal", "#0000FF",
           "bus_stop","#00FF00",
-          "bus_staition","#00FF00",
+          "bus_station","#00FF00",
           "#ff8c00"
         ],
         "circle-stroke-width": [
