@@ -28,14 +28,23 @@ map.setLayoutProperty('popchange-fill-layer', 'visibility', 'none');
  * 属性表示
  * *************************************************************** */
 
+// クリックイベントおよびタッチイベントを追加
 map.on('click', (e) => {
-    const features = map.queryRenderedFeatures(e.point);
+    handleMapClick(e.point);
+});
+
+map.on('touchend', (e) => {
+    handleMapClick(e.point);
+});
+
+function handleMapClick(point) {
+    const features = map.queryRenderedFeatures(point);
 
     if (features.length) {
         const properties = features[0].properties;
-        displayFeatureProperties(properties, e.point);
+        displayFeatureProperties(properties, point);
     }
-});
+}
 
 function displayFeatureProperties(properties, point) {
     const propertiesDisplay = document.getElementById('properties-display');
@@ -93,11 +102,16 @@ const propertiesDisplay = document.createElement('div');
 propertiesDisplay.id = 'properties-display';
 document.body.appendChild(propertiesDisplay);
 
-// 右クリックイベントを追加して属性情報を非表示にする
+// 右クリックおよび長押しイベントを追加して属性情報を非表示にする
 map.on('contextmenu', (e) => {
     hideFeatureProperties();
 });
 
+map.on('touchstart', (e) => {
+    if (e.touches.length > 1) {
+        hideFeatureProperties();
+    }
+});
 
 /*******************************************************************
  * レイヤON/OFF
