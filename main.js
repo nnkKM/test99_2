@@ -53,6 +53,12 @@ function displayFeatureProperties(properties, point) {
     propertiesDisplay.style.top = `${point.y + 10}px`;
 }
 
+// 属性情報を非表示にする関数
+function hideFeatureProperties() {
+    const propertiesDisplay = document.getElementById('properties-display');
+    propertiesDisplay.style.display = 'none';
+}
+
 // 属性情報表示用のスタイルを追加
 const style = document.createElement('style');
 style.innerHTML = `
@@ -87,7 +93,10 @@ const propertiesDisplay = document.createElement('div');
 propertiesDisplay.id = 'properties-display';
 document.body.appendChild(propertiesDisplay);
 
-
+// 右クリックイベントを追加して属性情報を非表示にする
+map.on('contextmenu', (e) => {
+    hideFeatureProperties();
+});
 
 
 /*******************************************************************
