@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SDG 11.2.1 ver.99.0</title>
+    <title>SDG 11.2.1 ver.99.2</title>
     <link href="https://unpkg.com/maplibre-gl@1.15.2/dist/maplibre-gl.css" rel="stylesheet"/>
     <link href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-draw/v1.4.3/mapbox-gl-draw.css" rel="stylesheet" />
     <link rel="stylesheet" href="style.css">
@@ -22,7 +22,7 @@
             <br>
             <label>
                 <input type="checkbox" id="population-all-fill-layer-chk" checked>
-                population2020
+                population
             </label>
             <!-- 年代ごとの表示スライダーバー -->
             <div id="slider-container-pop">
@@ -30,8 +30,8 @@
                 <input type="range" id="year-slider-pop" min="2000" max="2020" value="2020" step="1">
             </div>
             <label>
-                <input type="checkbox" id="popchange-all-fill-layer-chk" checked>
-                人口増減
+                <input type="checkbox" id="popchange-all-fill-layer-chk" >
+                人口増減(～2020)
             </label>
             <!-- 年代ごとの表示スライダーバー -->
             <div id="slider-container-popchange">
@@ -42,9 +42,6 @@
                 <input type="checkbox" id="PublicTransport-points-layer-chk" checked>
                 公共交通機関
             </label>
-            <br>
-            <label>------属性情報------</label>
-            <div id="attributes"></div>
         </div>
 
         <!-- メモ機能 -->
@@ -60,6 +57,9 @@
 
     <!-- 現在のズームレベル -->
     <div id="zoom-level"></div>
+
+    <!-- 属性情報表示 -->
+    <div id="properties-display" style="display: none;"></div>
 
     <!-- 既存のライブラリは以下に記述 -->
     <script src="https://cdn.jsdelivr.net/npm/@turf/turf/turf.min.js"></script>
