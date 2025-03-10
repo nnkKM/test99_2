@@ -18,8 +18,8 @@ map.on('load', () => {
     updateMapStyle_popchange("2019");
 
 // 初期状態で特定のレイヤーを非表示に設定
-map.setLayoutProperty('popchange-fill-layer', 'visibility', 'none');
-
+map.setLayoutProperty('popchange-fill-layer', 'visibility', 'none'); 
+map.setLayoutProperty('popchange-outline-layer', 'visibility', 'none');
 
 });
 
