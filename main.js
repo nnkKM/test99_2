@@ -109,10 +109,25 @@ const layerIds = [
     'PublicTransport-points-layer'
 ];
 
+// 一般レイヤの表示/非表示を切り替える関数
+const toggleLayer = (id) => {
+    const isChecked = document.getElementById(`${id}-chk`).checked;
+    if (isChecked) {
+        map.setLayoutProperty(id, 'visibility', 'visible');
+    } else {
+        map.setLayoutProperty(id, 'visibility', 'none');
+    }
+};
 
-// 人口データのレイヤはここで切替
-document.querySelector('#population-all-fill-layer-chk').addEventListener('change', () => {
-    const isChecked = document.getElementById('population-all-fill-layer-chk').checked;
+// 一般レイヤのチェックボックスに変更イベントを追加
+layerIds.forEach(lyrId => {
+    document.querySelector(`#${lyrId}-chk`).addEventListener('change', () => {
+        toggleLayer(lyrId);
+    });
+});
+
+// 人口データの表示/非表示を切り替える関数
+const togglePopulationLayer = (isChecked) => {
     const fillLayerIds = ['population-fill-layer', 'population-outline-layer'];
     fillLayerIds.forEach(id => {
         if (isChecked) {
@@ -121,10 +136,9 @@ document.querySelector('#population-all-fill-layer-chk').addEventListener('chang
             map.setLayoutProperty(id, 'visibility', 'none');
         }
     });
-});
+};
 
-document.querySelector('#popchange-all-fill-layer-chk').addEventListener('change', () => {
-    const isChecked = document.getElementById('popchange-all-fill-layer-chk').checked;
+const togglePopChangeLayer = (isChecked) => {
     const fillLayerIds = ['popchange-fill-layer', 'popchange-outline-layer'];
     fillLayerIds.forEach(id => {
         if (isChecked) {
@@ -133,6 +147,17 @@ document.querySelector('#popchange-all-fill-layer-chk').addEventListener('change
             map.setLayoutProperty(id, 'visibility', 'none');
         }
     });
+};
+
+// 人口データのレイヤはここで切替
+document.querySelector('#population-all-fill-layer-chk').addEventListener('change', () => {
+    const isChecked = document.getElementById('population-all-fill-layer-chk').checked;
+    togglePopulationLayer(isChecked);
+});
+
+document.querySelector('#popchange-all-fill-layer-chk').addEventListener('change', () => {
+    const isChecked = document.getElementById('popchange-all-fill-layer-chk').checked;
+    togglePopChangeLayer(isChecked);
 });
 
 document.querySelector('#toggle-layers-btn').addEventListener('click', () => {
@@ -144,20 +169,67 @@ document.querySelector('#toggle-layers-btn').addEventListener('click', () => {
     }
 });
 
-const toggleLayer = (id) => {
-    const isChecked = document.getElementById(`${id}-chk`).checked;
-    if (isChecked) {
-        map.setLayoutProperty(id, 'visibility', 'visible');
-    } else {
-        map.setLayoutProperty(id, 'visibility', 'none');
-    }
-}
+// レイヤ階層試作
+document.addEventListener('DOMContentLoaded', () => {
+    const sdg1121LayerChk = document.getElementById('sdg1121-layer-chk');
+    const sdg1121ToggleBtn = document.getElementById('sdg1121-toggle-btn');
+    const sdg1121Layers = document.getElementById('sdg1121-layers');
 
-layerIds.forEach(lyrId => {
-    document.querySelector(`#${lyrId}-chk`).addEventListener('change', () => {
-        toggleLayer(lyrId);
+    const childLayerChks = [
+        document.getElementById('population-all-fill-layer-chk'),
+        document.getElementById('popchange-all-fill-layer-chk'),
+        document.getElementById('PublicTransport-points-layer-chk')
+    ];
+
+    // 子レイヤの表示/非表示を更新する関数
+    const updateChildLayers = (isChecked) => {
+        childLayerChks.forEach(chk => {
+            chk.checked = isChecked;
+            const layerId = chk.id.replace('-chk', '');
+            if (layerId === 'population-all-fill-layer') {
+                togglePopulationLayer(isChecked);
+            } else if (layerId === 'popchange-all-fill-layer') {
+                togglePopChangeLayer(isChecked);
+            } else {
+                toggleLayer(layerId);
+            }
+        });
+    };
+
+    // 親レイヤのチェックボックスの動作
+    sdg1121LayerChk.addEventListener('change', () => {
+        const isChecked = sdg1121LayerChk.checked;
+        updateChildLayers(isChecked);
+    });
+
+    // トグルボタンの動作
+    sdg1121ToggleBtn.addEventListener('click', () => {
+        if (sdg1121Layers.style.display === 'none') {
+            sdg1121Layers.style.display = 'block';
+            sdg1121ToggleBtn.textContent = '▼';
+        } else {
+            sdg1121Layers.style.display = 'none';
+            sdg1121ToggleBtn.textContent = '▶';
+        }
+    });
+
+    // 子レイヤのチェックボックスが変更されたときの動作
+    childLayerChks.forEach(chk => {
+        chk.addEventListener('change', () => {
+            const layerId = chk.id.replace('-chk', '');
+            if (layerId === 'population-all-fill-layer') {
+                togglePopulationLayer(chk.checked);
+            } else if (layerId === 'popchange-all-fill-layer') {
+                togglePopChangeLayer(chk.checked);
+            } else {
+                toggleLayer(layerId);
+            }
+            // 小レイヤのチェック状態に応じて親レイヤのチェックボックスを更新
+            sdg1121LayerChk.checked = childLayerChks.some(layerChk => layerChk.checked);
+        });
     });
 });
+
 
 /*******************************************************************
  * 年度ごとの表示切替
